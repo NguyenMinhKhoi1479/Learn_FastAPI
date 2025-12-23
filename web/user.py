@@ -18,7 +18,7 @@ router = APIRouter(prefix="/user")
 #dependcy make ad post to "/user/token"
 # from a form containing a username and password
 # and returns on access token 
-oauth2_dep = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_dep = OAuth2PasswordBearer(tokenUrl="/user/token")
 
 def unauthed():
     raise HTTPException(
@@ -42,6 +42,10 @@ async def create_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     )
     
     return {"access_token" : access_token , "token_type" : "bearer"}
+
+@router.get("/token")
+def get_access_token(token: str = Depends(oauth2_dep)) -> dict:
+        return {"token" : token}
 
 @router.get("/")
 def get_all() -> list[User]:

@@ -1,14 +1,14 @@
 from model.user import User
-from init_db import conn, curs, IntegrityError
+from data.init_db import conn, curs, IntegrityError
 from error import Missing, Duplicate
 
 
 curs.execute("""create table if not exists User(
-        username text primary key
+        username text primary key,
         hashed_pwd text)""")
 
 curs.execute("""create table if not exists xUser(
-        username text primary key
+        username text primary key,
         hashed_pwd text)""")
 
 def row_to_model(row: tuple) -> dict:
@@ -38,7 +38,7 @@ def create(user: User, table: str = "User") -> User:
     try:
         curs.execute(qry,param)
     except IntegrityError:
-        raise Duplicate(f"user {user.name} already exists")
+        raise Duplicate(f"user {user.username} already exists")
     return get_one(user.username)
 
 def modify(name: str, user: User, table: str = "User"):
@@ -49,7 +49,6 @@ def modify(name: str, user: User, table: str = "User"):
                 
     param = model_to_dict(user=user)
     param.update({"name" : name})
-    
     try:
         curs.execute(qry,param)
     except IntegrityError:
@@ -58,14 +57,12 @@ def modify(name: str, user: User, table: str = "User"):
     return get_one(user.username)
 
 def delete(name: str):
-    user = get_one(user)
+    user = get_one(name)
     qry = f"""delete from User where username = :username"""
     param = {"username" : name}
     
     curs.execute(qry,param)
     
-    if curs.rowcount != 1:
-        raise Missing(msg=f"user {name} not found")
     create(user=user,table="xUser")
     
     

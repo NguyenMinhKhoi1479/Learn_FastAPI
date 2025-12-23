@@ -1,9 +1,9 @@
-from datatime import timedelta, datetime
+from datetime import timedelta, datetime
 import os
 from jose import jwt
 from model.user import User
 
-if os.getenv("CRIPTD_UNIT_TEST"):
+if os.getenv("CRYPTID_UNIT_TEST"):
     from fake import user as data
 else:
     from data import user as data
@@ -70,8 +70,9 @@ def create_access_token(data: dict, expires: timedelta | None = None):
 def get_all() -> list[User]:
     return data.get_all()
 def get_one(name: str) -> User:
-    return data.get_one()
+    return data.get_one(name)
 def create(user: User) -> User:
+    user.hashed_pwd = hash_pwd(user.hashed_pwd)
     return data.create(user)
 def modify(name: str, user: User) -> User:
     return data.modify(name,user)

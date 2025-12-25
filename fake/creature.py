@@ -1,5 +1,5 @@
 from model.creature import Creature
-
+from error import Missing, Duplicate
 #     name: str
 #     country: str
 #     area: str
@@ -40,19 +40,29 @@ _Creatures = [
 def get_all() -> list[Creature]:
     return _Creatures
 
-def get_by_name(name:str) -> Creature:
+def get_one(name:str) -> Creature:
     for creature in _Creatures:
         if creature.name == name:
             return creature
+    raise Missing(f"Missing")
 
 def create(creature: Creature):
+    for crea in _Creatures:
+        if creature.name == crea.name:
+            raise Duplicate(f"Duplicate")
     return creature
 
-def modify(creature: Creature):
-    return creature
+def modify(name: str,creature: Creature):
+    for crea in _Creatures:
+        if creature.name == name:
+            return creature
+    raise Missing(f"Missing")
 
 def replace(creature: Creature):
     return creature
 
 def delete(name: str):
-    return None
+    for creature in _Creatures:
+        if creature.name == name:
+            return None
+    raise Missing(f"Missing")

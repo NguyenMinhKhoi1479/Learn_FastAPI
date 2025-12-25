@@ -20,12 +20,10 @@ def model_to_dict(creature: Creature) -> dict:
 def get_one(name:str) -> Creature:
     qry = """select * from creature where name = :name"""
     param = {"name" : name}
-    row = curs.execute(qry,param)
-    
-    if not row:
+    row = curs.execute(qry,param).fetchone()
+    if row is None:
         raise Missing(msg=f"{name} not found")
-    
-    return row_to_model(curs.fetchone())
+    return row_to_model(row)
 
 def get_all() -> list[Creature]:
     qry = """select * from creature"""
@@ -40,7 +38,6 @@ def create(creature: Creature):
         curs.execute(qry,param)
     except IntegrityError:
         raise Duplicate(f"{creature.name} already exists")
-
     return get_one(creature.name)
 
 def modify(name: str,creature: Creature) -> Creature:
@@ -67,5 +64,5 @@ def delete(name: str) -> bool:
         curs.execute(qry,param)
     except IntegrityError:
         raise Missing(f"{name} not found")
-    return {"message" : "success"}
+    return None
 
